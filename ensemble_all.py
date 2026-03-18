@@ -94,7 +94,7 @@ if __name__ == "__main__":
     
     # Učitaj test slike
     print("Učitavanje test skupa...")
-    test_ds = TestDataset("data/test", transform=transform)
+    test_ds = TestDataset("data_face/test", transform=transform)
     test_loader = DataLoader(test_ds, batch_size=BATCH_SIZE, shuffle=False)
     
     print(f"Testiranje na {len(test_ds)} slika")
@@ -137,7 +137,8 @@ if __name__ == "__main__":
     
     ensemble_no_eyes = EnsembleModel([
         "best_model.pth",
-        "best_model_skin.pth"
+        "best_model_skin.pth",
+        "best_model_hair.pth"
     ], device=DEVICE)
     
     all_preds = []

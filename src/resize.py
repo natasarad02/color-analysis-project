@@ -4,7 +4,7 @@ from pathlib import Path
 
 def process_images():
     """
-    Proveri raw folder, obradi nove slike i stavi u processed
+    Proverava raw folder, obradjuje nove slike i stavlja ih u processed
     Format: 001_ime_slike.jpg, 002_ime_slike.jpg, ...
     """
     seasons = ['spring', 'summer', 'autumn', 'winter']
@@ -72,16 +72,16 @@ def process_images():
             img = cv2.imread(str(img_path))
             
             if img is None:
-                print(f"    ⚠ Greška pri učitavanju!")
+                print(f" Greška pri učitavanju!")
                 continue
             
             img_resized = cv2.resize(img, target_size)
             cv2.imwrite(str(processed_file), img_resized, 
                        [cv2.IMWRITE_JPEG_QUALITY, 90])
             
-            print(f"    ✓ Sačuvano")
+            print(f"  Sačuvano")
             
-            # DODAJ U LISTU POSTOJEĆIH da ne duplira u istom run-u
+            # Dodaje u listu postojecih da ne duplira u istom run-u
             existing_files.append(processed_file)
             next_number += 1
             processed_count += 1
@@ -90,4 +90,4 @@ def process_images():
 
 if __name__ == "__main__":
     process_images()
-    print("\n✓ Sve obradjeno!")
+    print("\n Sve obradjeno!")

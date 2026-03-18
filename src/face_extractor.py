@@ -7,7 +7,7 @@ import os
 
 class FaceExtractor:
     """
-    Klasa za izdvajanje ključnih regiona lica koristeći MediaPipe Face Landmarker (novi API)
+    Klasa za izdvajanje ključnih regiona lica koristeći MediaPipe Face Landmarker 
     """
     
     def __init__(self, model_path='face_landmarker.task'):
@@ -189,7 +189,7 @@ class FaceExtractor:
         """
         h, w = image.shape[:2]
         
-        # 1. Geometrijska maska (prati oblik glave)
+        # Geometrijska maska (prati oblik glave)
         forehead_indices = [10, 338, 297, 332, 284, 251, 389, 356, 454, 323, 361, 288, 397, 365, 379, 378, 400, 377]
         forehead_points = np.array([
             [int(landmarks[idx][0] * w), int(landmarks[idx][1] * h)] 
@@ -234,7 +234,7 @@ class FaceExtractor:
         
         cv2.fillPoly(geo_mask, [hair_polygon], 255)
         
-        # 2. Segmentacija po boji (ako imamo dobar uzorak)
+        #  Segmentacija po boji (ako imamo dobar uzorak)
         color_mask = np.zeros((h, w), dtype=np.uint8)
         hair_mask = geo_mask.copy()  # početna maska je geometrijska
         
@@ -277,7 +277,7 @@ class FaceExtractor:
                 if cv2.countNonZero(hair_mask) < 500:
                     hair_mask = geo_mask.copy()
         
-        # 3. Oduzmi lice (uvek radimo)
+        #  Oduzmi lice (uvek radimo)
         face_mask = np.zeros((h, w), dtype=np.uint8)
         face_points = np.array([
             [int(landmarks[idx][0] * w), int(landmarks[idx][1] * h)] 
@@ -291,7 +291,7 @@ class FaceExtractor:
         
         hair_mask = cv2.subtract(hair_mask, face_mask)
         
-        # 4. Očisti masku
+        #  Očisti masku
         kernel = np.ones((5, 5), np.uint8)
         hair_mask = cv2.morphologyEx(hair_mask, cv2.MORPH_CLOSE, kernel)
         hair_mask = cv2.morphologyEx(hair_mask, cv2.MORPH_OPEN, kernel)

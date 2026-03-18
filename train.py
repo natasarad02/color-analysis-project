@@ -44,9 +44,7 @@ if __name__ == '__main__':
     
     print("Using device:", DEVICE)
     
-    # -------------------------
     # DATASETS
-    # -------------------------
     train_ds = datasets.ImageFolder(os.path.join(DATA_DIR, "train"), transform=train_tfms)
     val_ds   = datasets.ImageFolder(os.path.join(DATA_DIR, "val"), transform=val_tfms)
     test_ds  = datasets.ImageFolder(os.path.join(DATA_DIR, "test"), transform=val_tfms)
@@ -58,9 +56,7 @@ if __name__ == '__main__':
     
     print("Classes:", train_ds.classes)
     
-    # -------------------------
     # MODEL
-    # -------------------------
     model = models.mobilenet_v3_large(weights=models.MobileNet_V3_Large_Weights.DEFAULT)
     
     in_features = model.classifier[-1].in_features
@@ -74,9 +70,7 @@ if __name__ == '__main__':
     best_val_acc = 0
     best_path = "best_model.pth"
     
-    # -------------------------
     # TRAINING LOOP
-    # -------------------------
     for epoch in range(EPOCHS):
         model.train()
         train_correct = 0
@@ -100,9 +94,7 @@ if __name__ == '__main__':
         train_acc = train_correct / train_total
         train_loss /= train_total
     
-        # -------------------------
         # VALIDATION
-        # -------------------------
         model.eval()
         val_correct = 0
         val_total = 0
@@ -129,11 +121,9 @@ if __name__ == '__main__':
         if val_acc > best_val_acc:
             best_val_acc = val_acc
             torch.save(model.state_dict(), best_path)
-            print("✅ Saved new best model")
+            print("Saved new best model")
     
-    # -------------------------
     # TEST EVALUATION
-    # -------------------------
     print("\n=== Testing Best Model ===")
     
     model.load_state_dict(torch.load(best_path))
