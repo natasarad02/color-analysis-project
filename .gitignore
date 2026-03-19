@@ -15,7 +15,6 @@ data/raw/*
 !data/raw/.gitkeep
 
 
-data/
 data_face/
 data_regions_all/
 
