@@ -24,64 +24,6 @@ class ModelVisualizer:
         self.class_names = class_names if class_names else ['Spring', 'Summer', 'Autumn', 'Winter']
         self.model.eval()
         
-    def visualize_feature_maps(self, image_tensor, layer_name=None):
-        """
-        Vizuelizacija feature mapa iz prvih konvolucionih slojeva
-        
-        Args:
-            image_tensor: [C, H, W] ili [1, C, H, W] tensor
-            layer_name: ime sloja za vizuelizaciju (ako None, uzima prvi conv sloj)
-        """
-        self.model.eval()
-        
-        # Propratni hook za hvatanje feature mapa
-        feature_maps = []
-        
-        def hook_fn(module, input, output):
-            feature_maps.append(output.detach())
-        
-        # Pronađi prvi konvolucioni sloj
-        if layer_name is None:
-            # Tražimo prvi Conv2d sloj
-            for name, module in self.model.named_modules():
-                if isinstance(module, torch.nn.Conv2d):
-                    handle = module.register_forward_hook(hook_fn)
-                    break
-        else:
-            # Koristi specifičan sloj
-            for name, module in self.model.named_modules():
-                if name == layer_name:
-                    handle = module.register_forward_hook(hook_fn)
-                    break
-        
-        # Propagacija slike kroz model
-        with torch.no_grad():
-            if image_tensor.dim() == 3:
-                image_tensor = image_tensor.unsqueeze(0)
-            image_tensor = image_tensor.to(self.device)
-            _ = self.model(image_tensor)
-        
-        handle.remove()
-        
-        if not feature_maps:
-            print("Nije pronađen konvolucioni sloj!")
-            return
-        
-        fmaps = feature_maps[0][0]  # [C, H, W]
-        
-        # Prikaz prvih 16 feature mapa
-        n_maps = min(16, fmaps.shape[0])
-        fig, axes = plt.subplots(4, 4, figsize=(12, 12))
-        fig.suptitle(f'Feature Maps (prvih {n_maps})', fontsize=16)
-        
-        for i in range(n_maps):
-            ax = axes[i // 4, i % 4]
-            ax.imshow(fmaps[i].cpu(), cmap='viridis')
-            ax.axis('off')
-            ax.set_title(f'Map {i+1}')
-        
-        plt.tight_layout()
-        plt.show()
         
     def visualize_activation_maps(self, image_tensor, target_class=None):
         """
