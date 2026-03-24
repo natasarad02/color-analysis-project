@@ -8,17 +8,9 @@ import seaborn as sns
 from PIL import Image
 
 class ModelVisualizer:
-    """
-    Klasa za vizuelizaciju šta je CNN model naučio
-    """
+    #Klasa za vizuelizaciju šta je CNN model naučio
     
     def __init__(self, model, device='cpu', class_names=None):
-        """
-        Args:
-            model: trenirani CNN model
-            device: 'cpu' ili 'cuda'
-            class_names: liste naziva klasa ['spring', 'summer', 'autumn', 'winter']
-        """
         self.model = model
         self.device = device
         self.class_names = class_names if class_names else ['Spring', 'Summer', 'Autumn', 'Winter']
@@ -26,39 +18,33 @@ class ModelVisualizer:
         
         
     def visualize_activation_maps(self, image_tensor, target_class=None):
-        """
-        Vizuelizacija aktivacijskih mapa (CAM/Grad-CAM)
-        Pojednostavljena verzija - prikazuje aktivacije poslednjeg konvolucionog sloja
+        #Vizuelizacija aktivacijskih mapa (CAM/Grad-CAM)
+        #Pojednostavljena verzija - prikazuje aktivacije poslednjeg konvolucionog sloja
+        self.model.eval() #prebacuje u evaluacioni mod
         
-        Args:
-            image_tensor: ulazna slika [C, H, W] ili [1, C, H, W]
-            target_class: klasa za koju se računa aktivacija (None = max)
-        """
-        self.model.eval()
-        
-        if image_tensor.dim() == 3:
+        if image_tensor.dim() == 3: #ako su tri dimenzije, dodaje jos jednu sa 1
             image_tensor = image_tensor.unsqueeze(0)
         image_tensor = image_tensor.to(self.device)
         
-        # Pronađi poslednji konvolucioni sloj
+        # Pronađi poslednji konvolucioni sloj, pre klasifikacionog
         last_conv = None
         for module in self.model.modules():
             if isinstance(module, torch.nn.Conv2d):
                 last_conv = module
         
-        # Hvatanje feature mapa
+        # Hvatanje feature mapa (aktivacija)
         feature_maps = []
         def hook_fn(module, input, output):
             feature_maps.append(output.detach())
         
         if last_conv:
-            handle = last_conv.register_forward_hook(hook_fn)
+            handle = last_conv.register_forward_hook(hook_fn) #registruje hook na poslednji konv sloj
         
         with torch.no_grad():
-            outputs = self.model(image_tensor)
+            outputs = self.model(image_tensor) #propusta sliku kroz model
             
         if last_conv:
-            handle.remove()
+            handle.remove() #uklanja hook
         
         # Aktivacije
         if feature_maps:
@@ -67,7 +53,7 @@ class ModelVisualizer:
             # Sumiraj aktivacije po kanalima
             activation_map = activations.mean(dim=0).cpu().numpy()
             
-            # Normalizacija
+            # Normalizacija (sve su izmedju 0 i 1)
             activation_map = (activation_map - activation_map.min()) / (activation_map.max() - activation_map.min() + 1e-8)
             
             # Originalna slika
@@ -86,7 +72,6 @@ class ModelVisualizer:
             axes[1].set_title('Aktivaciona mapa')
             axes[1].axis('off')
             
-            # Overlay
             axes[2].imshow(img)
             axes[2].imshow(activation_map, cmap='hot', alpha=0.5)
             axes[2].set_title('Overlay')
@@ -99,35 +84,32 @@ class ModelVisualizer:
             print("Nije pronađen konvolucioni sloj")
     
     def visualize_tsne(self, dataloader, max_samples=500):
-        """
-        t-SNE vizuelizacija feature vektora (embeddinga) iz modela
+
+        #t-SNE vizuelizacija feature vektora iz modela
         
-        Args:
-            dataloader: DataLoader sa podacima
-            max_samples: maksimalan broj uzoraka za vizuelizaciju
-        """
         self.model.eval()
         
-        embeddings = []
-        labels = []
+        embeddings = [] #vektori
+        labels = [] #lista za cuvanje pravih klasa
         
         with torch.no_grad():
             for x, y in dataloader:
                 x = x.to(self.device)
                 
+                #Izvlacimo vektore
                 # Ekstrakcija embeddinga (pre classifier sloja)
                 # Za MobileNet, uzimamo globalni pooling sloj
                 features = self.model.features(x)
                 features = self.model.avgpool(features)
                 features = torch.flatten(features, 1)
                 
-                embeddings.append(features.cpu())
-                labels.append(y)
+                embeddings.append(features.cpu()) #cuvamo vektore
+                labels.append(y) 
                 
                 if len(embeddings) * x.size(0) >= max_samples:
                     break
         
-        embeddings = torch.cat(embeddings, dim=0)[:max_samples].numpy()
+        embeddings = torch.cat(embeddings, dim=0)[:max_samples].numpy() #spaja sve batch-eve u jedan veliki tensor
         labels = torch.cat(labels, dim=0)[:max_samples].numpy()
         
         # t-SNE redukcija dimenzija
@@ -149,9 +131,8 @@ class ModelVisualizer:
         plt.show()
         
     def visualize_confusion_matrix(self, test_loader):
-        """
-        Vizuelizacija konfuzione matrice
-        """
+
+        #Vizuelizacija konfuzione matrice
         from sklearn.metrics import confusion_matrix
         
         y_true = []
@@ -182,13 +163,8 @@ class ModelVisualizer:
         return cm
     
     def visualize_misclassified(self, test_loader, num_examples=8):
-        """
-        Prikaz pogrešno klasifikovanih primera
-        
-        Args:
-            test_loader: DataLoader sa test podacima
-            num_examples: broj primera za prikaz
-        """
+        #Prikaz pogrešno klasifikovanih primera
+
         self.model.eval()
         
         misclassified = []
@@ -247,3 +223,42 @@ class ModelVisualizer:
         plt.suptitle('Pogrešno klasifikovani primeri', fontsize=14)
         plt.tight_layout()
         plt.show()
+        
+    def visualize_class_averages(self, dataloader):
+        #Prikaz prosečnih slika za svaku klasu
+
+        self.model.eval()
+        
+        # Sakupi sve slike po klasama
+        class_images = {i: [] for i in range(len(self.class_names))}
+        
+        with torch.no_grad():
+            for x, y in dataloader:
+                for i in range(len(x)):
+                    img = x[i].cpu().numpy().transpose(1, 2, 0)
+                    # Denormalizacija
+                    img = img * np.array([0.229, 0.224, 0.225]) + np.array([0.485, 0.456, 0.406])
+                    img = np.clip(img, 0, 1)
+                    class_images[y[i].item()].append(img)
+        
+        # Izračunaj prosečnu sliku za svaku klasu
+        avg_images = {}
+        for class_idx, images in class_images.items():
+            if images:
+                avg_images[class_idx] = np.mean(images, axis=0)
+        
+        # Prikaz
+        fig, axes = plt.subplots(1, len(avg_images), figsize=(5 * len(avg_images), 5))
+        if len(avg_images) == 1:
+            axes = [axes]
+        
+        for i, (class_idx, avg_img) in enumerate(avg_images.items()):
+            axes[i].imshow(avg_img)
+            axes[i].set_title(f'Prosečna slika\n{self.class_names[class_idx]}', fontweight='bold')
+            axes[i].axis('off')
+        
+        plt.suptitle('Prosečne slike po klasama', fontsize=16, fontweight='bold')
+        plt.tight_layout()
+        plt.show()
+        
+        return avg_images
