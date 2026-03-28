@@ -82,53 +82,6 @@ class ModelVisualizer:
             plt.show()
         else:
             print("Nije pronađen konvolucioni sloj")
-    
-    def visualize_tsne(self, dataloader, max_samples=500):
-
-        #t-SNE vizuelizacija feature vektora iz modela
-        
-        self.model.eval()
-        
-        embeddings = [] #vektori
-        labels = [] #lista za cuvanje pravih klasa
-        
-        with torch.no_grad():
-            for x, y in dataloader:
-                x = x.to(self.device)
-                
-                #Izvlacimo vektore
-                # Ekstrakcija embeddinga (pre classifier sloja)
-                # Za MobileNet, uzimamo globalni pooling sloj
-                features = self.model.features(x)
-                features = self.model.avgpool(features)
-                features = torch.flatten(features, 1)
-                
-                embeddings.append(features.cpu()) #cuvamo vektore
-                labels.append(y) 
-                
-                if len(embeddings) * x.size(0) >= max_samples:
-                    break
-        
-        embeddings = torch.cat(embeddings, dim=0)[:max_samples].numpy() #spaja sve batch-eve u jedan veliki tensor
-        labels = torch.cat(labels, dim=0)[:max_samples].numpy()
-        
-        # t-SNE redukcija dimenzija
-        tsne = TSNE(n_components=2, random_state=42, perplexity=30)
-        embeddings_2d = tsne.fit_transform(embeddings)
-        
-        # Vizuelizacija
-        plt.figure(figsize=(12, 10))
-        for i, class_name in enumerate(self.class_names):
-            mask = labels == i
-            plt.scatter(embeddings_2d[mask, 0], embeddings_2d[mask, 1], 
-                       label=class_name, alpha=0.7, s=50)
-        
-        plt.title('t-SNE vizuelizacija embeddinga slika', fontsize=14)
-        plt.xlabel('t-SNE dimenzija 1')
-        plt.ylabel('t-SNE dimenzija 2')
-        plt.legend()
-        plt.grid(alpha=0.3)
-        plt.show()
         
     def visualize_confusion_matrix(self, test_loader):
 
