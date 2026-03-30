@@ -143,7 +143,7 @@ def main():
         if val_acc > best_val_acc:
             best_val_acc = val_acc
             torch.save(model.state_dict(), best_path)
-            print(f"✅ Saved new best model -> {best_path}")
+            print(f" Saved new best model -> {best_path}")
 
     # -------------------------
     # TEST EVALUATION

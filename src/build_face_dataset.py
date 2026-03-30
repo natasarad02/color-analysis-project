@@ -6,8 +6,8 @@ from tqdm import tqdm
 
 from face_extractor import FaceExtractor
 
-SRC_DIR = Path("data")          # your current dataset
-DST_DIR = Path("data_face")     # new cropped dataset output
+SRC_DIR = Path("data")          
+DST_DIR = Path("data_face")     
 IMG_SIZE = 224
 
 SPLITS = ["train", "val", "test"]

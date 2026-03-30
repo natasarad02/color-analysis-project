@@ -50,7 +50,7 @@ val_tfms = transforms.Compose([
 if __name__ == '__main__':
     # Proveri da li folder postoji
     if not os.path.exists(DATA_DIR):
-        print(f"❌ Folder ne postoji: {DATA_DIR}")
+        print(f" Folder ne postoji: {DATA_DIR}")
         print("Proveri putanju!")
         exit()
     

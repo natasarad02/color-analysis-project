@@ -6,9 +6,6 @@ from PIL import Image
 import os
 from sklearn.metrics import classification_report, confusion_matrix
 
-# ====================
-# ENSEMBLE KLASA
-# ====================
 class EnsembleModel:
     def __init__(self, model_paths, device="cpu"):
         self.device = device
@@ -42,9 +39,6 @@ class EnsembleModel:
         probs = self.predict(x)
         return probs.argmax(dim=1)
 
-# ====================
-# DATASET
-# ====================
 class TestDataset(Dataset):
     def __init__(self, root_dir, transform=None):
         self.root_dir = root_dir
@@ -77,9 +71,7 @@ class TestDataset(Dataset):
         
         return image, label
 
-# ====================
-# GLAVNI DEO
-# ====================
+
 if __name__ == "__main__":
     DEVICE = "cpu"
     BATCH_SIZE = 16
@@ -100,13 +92,11 @@ if __name__ == "__main__":
     print(f"Testiranje na {len(test_ds)} slika")
     print("Klase:", test_ds.classes)
     
-    # ====================
-    # TESTIRAJ RAZLIČITE KOMBINACIJE
-    # ====================
+
     
     # Opcija 1: Svi modeli
     print("\n" + "="*50)
-    print("🎯 ENSEMBLE - SVI MODELI")
+    print(" ENSEMBLE - SVI MODELI")
     print("="*50)
     
     ensemble_all = EnsembleModel([

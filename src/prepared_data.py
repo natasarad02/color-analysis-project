@@ -44,7 +44,7 @@ def prepare_region_dataset(input_dir="data", output_base_dir="data_regions", reg
                 result = extractor.extract_features(img_path, visualize=False)
                 
                 if result is None:
-                    print(f"  ❌ Lice nije detektovano: {img_name}")
+                    print(f"   Lice nije detektovano: {img_name}")
                     continue
                 
                 if region == 'all':
@@ -91,13 +91,13 @@ def prepare_region_dataset(input_dir="data", output_base_dir="data_regions", reg
                         cv2.imwrite(os.path.join(output_path, img_name), output_img)
     
     extractor.close()
-    print(f"\n✅ Dataset za region '{region}' je spreman!")
+    print(f"\n Dataset za region '{region}' je spreman!")
 
 if __name__ == "__main__":
     # Pripremi sve regione odjednom
     prepare_region_dataset("data", "data_regions_all", region="all")
     
-    print("\n📁 Struktura foldera:")
+    print("\n Struktura foldera:")
     print("data_regions_all/")
     print("├── skin/")
     print("│   ├── train/spring/")

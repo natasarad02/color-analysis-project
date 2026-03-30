@@ -64,11 +64,11 @@ def test_random_images(data_dir="data", num_samples=3):
                 result = extractor.extract_features(img_path, visualize=False)
                 
                 if result is None:
-                    print(f"  ❌ Lice nije detektovano ili nema dovoljno piksela")
+                    print(f"   Lice nije detektovano ili nema dovoljno piksela")
                     continue
                 
                 # Statistika
-                print(f"  ✅ Uspešno!")
+                print(f"   Uspešno!")
                 print(f"     - Koža: {len(result['skin_pixels'])} piksela")
                 print(f"     - Kosa: {len(result['hair_pixels'])} piksela")
                 print(f"     - Levo oko: {result['left_eye'].shape}")
@@ -78,7 +78,7 @@ def test_random_images(data_dir="data", num_samples=3):
                 visualize_result(result, split, season)
                 
             except Exception as e:
-                print(f"  ❌ Greška: {str(e)}")
+                print(f"   Greška: {str(e)}")
     
     extractor.close()
     print(f"\n{'='*50}")
