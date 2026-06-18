@@ -102,6 +102,9 @@ The most common classification errors occurred between visually similar seasonal
 - Autumn and Spring
 - Summer and Spring
 
+<p align=center><img width="658" height="575" alt="image" src="https://github.com/user-attachments/assets/ea14ba13-40d5-4e7d-b785-9aa9a00bac3b"/></p>
+
+
 These mistakes are expected because the differences between these classes are subtle. Spring and Autumn both have warmer undertones, while Summer and Spring may differ mainly in saturation and softness.
 
 The main reasons for classification errors include:
@@ -120,6 +123,9 @@ The main reasons for classification errors include:
 | Summer | Pale complexion, cooler undertone, muted colors |
 | Autumn | Warm yellowish complexion, darker tones |
 | Winter | Darkest complexion, cool undertone, high contrast |
+
+<p align=center><img width="699" height="188" alt="image" src="https://github.com/user-attachments/assets/26856d77-1098-40bb-95ca-cd90a842bf2b" />
+</p>
 
 ## Conclusion
 
